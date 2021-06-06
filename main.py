@@ -2,21 +2,24 @@ import cv2
 import numpy as np
 from PIL import Image
 import os
+from pathlib import Path
 
 cascade_path = 'Cascades/haarcascade_frontalface_default.xml'
+dataset_dir = 'dataset'
+trainer_dir = 'trainer'
 
 
 def extract_faces(face_id, video):
     face_detector = cv2.CascadeClassifier(cascade_path)
 
-    print("\n [INFO] Initializing face capture. Look the camera and wait ...")
+    print("\n [INFO] Initializing face capture.")
 
     vidcap = cv2.VideoCapture(video)
     success, img = vidcap.read()
     count = 0
 
+    Path(dataset_dir).mkdir(parents=True, exist_ok=True)
     while success:
-        # img = cv2.flip(img, -1)  # flip video image vertically
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         faces = face_detector.detectMultiScale(gray, 1.3, 5)
 
@@ -25,7 +28,7 @@ def extract_faces(face_id, video):
             count += 1
 
             # Save the captured image into the datasets folder
-            cv2.imwrite("dataset/User." + str(face_id) + '.' + str(count) + ".jpg", gray[y:y + h, x:x + w])
+            cv2.imwrite(dataset_dir + "/User." + str(face_id) + '.' + str(count) + ".jpg", gray[y:y + h, x:x + w])
 
             cv2.imshow('image', img)
 
@@ -46,7 +49,6 @@ def getImagesAndLabels(path):
     ids = []
 
     for imagePath in imagePaths:
-
         PIL_img = Image.open(imagePath).convert('L')  # convert it to grayscale
         img_numpy = np.array(PIL_img, 'uint8')
 
@@ -63,15 +65,15 @@ def getImagesAndLabels(path):
 def train(face_id, video):
     count = extract_faces(face_id, video)
     # Path for face image database
-    path = 'dataset'
 
     recognizer = cv2.face.LBPHFaceRecognizer_create()
     print("\n [INFO] Training faces. It will take a few seconds. Wait ...")
-    faces, ids = getImagesAndLabels(path)
+    faces, ids = getImagesAndLabels(dataset_dir)
     recognizer.train(faces, np.array(ids))
 
     # Save the model into trainer/trainer.yml
-    recognizer.write('trainer/trainer.yml')  # recognizer.save() worked on Mac, but not on Pi
+    Path(trainer_dir).mkdir(parents=True, exist_ok=True)
+    recognizer.write(trainer_dir + '/trainer.yml')  # recognizer.save() worked on Mac, but not on Pi
 
     # Print the numer of faces trained and end program
     print("\n [INFO] {0} faces trained. Exiting Program".format(len(np.unique(ids))))
@@ -101,7 +103,7 @@ def face_recgonize():
     while True:
 
         ret, img = cam.read()
-        img = cv2.flip(img, -1)  # Flip vertically
+        # img = cv2.flip(img, -1)  # Flip vertically
 
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -143,10 +145,10 @@ def face_recgonize():
 
 def main():
     face_id = input('\n enter user id and press <return> ==>  ')
-    video = input('\n enter video path and press <return> ==>  ')
-    # video = 'nathan.mp4'  # input('\n enter video path end press <return> ==>  ')
+    # video = input('\n enter video path and press <return> ==>  ')
+    video = 'nathan.mp4'
     count = train(face_id, video)
-    print(count)
+    print("\nDetector captured " + str(count) + " faces")
     face_recgonize()
 
 
