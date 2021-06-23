@@ -20,6 +20,7 @@ def extract_faces(face_id, video):
 
     Path(dataset_dir).mkdir(parents=True, exist_ok=True)
     while success:
+        img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         faces = face_detector.detectMultiScale(gray, 1.3, 5)
 
