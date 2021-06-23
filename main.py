@@ -112,6 +112,7 @@ def face_recognize(face_id):
 
         ret, img = cam.read()
         # img = cv2.flip(img, -1)  # Flip vertically
+        img = cv2.rotate(img, cv2.ROTATE_180)
 
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -128,7 +129,7 @@ def face_recognize(face_id):
 
             id, confidence = recognizer.predict(gray[y:y + h, x:x + w])
 
-            if id == int(face_id):
+            if id == int(face_id) and confidence < 100:
                 recognized = True
                 break
 
