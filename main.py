@@ -82,9 +82,9 @@ def train(face_id, video):
     return count
 
 
-def face_recgonize(face_id):
+def face_recognize(face_id):
     recognizer = cv2.face.LBPHFaceRecognizer_create()
-    recognizer.read('trainer/trainer.yml')
+    recognizer.read(trainer_dir + '/trainer.yml')
     faceCascade = cv2.CascadeClassifier(cascade_path);
 
     font = cv2.FONT_HERSHEY_SIMPLEX
@@ -165,7 +165,7 @@ def main():
     # video = 'nathan.mp4'
     # count = train(face_id, video)
     # print("\nDetector captured " + str(count) + " faces")
-    is_rec = face_recgonize(face_id)
+    is_rec = face_recognize(face_id)
     print(is_rec)
 
 
