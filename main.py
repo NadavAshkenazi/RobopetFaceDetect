@@ -102,12 +102,13 @@ def face_recognize(face_id):
     minH = 0.1 * cam.get(4)
 
     count = 0
+    num_recognized = 0
     recognized = False
 
     while not recognized:
         print(count)
         count += 1
-        if count > 100:
+        if count > 200:
             break
 
         ret, img = cam.read()
@@ -129,20 +130,23 @@ def face_recognize(face_id):
 
             id, confidence = recognizer.predict(gray[y:y + h, x:x + w])
 
-            if id == int(face_id) and confidence < 100:
-                recognized = True
-                break
+            if id == int(face_id) and confidence < 75:
+                num_recognized += 1
+                print("Confidence: " + str(confidence))
+                if num_recognized > 2:
+                    recognized = True
+                    break
 
             # Check if confidence is less them 100 ==> "0" is perfect match
-            if (confidence < 100):
-                id = names[id]
-                confidence = "  {0}%".format(round(100 - confidence))
-            else:
-                id = "unknown"
-                confidence = "  {0}%".format(round(100 - confidence))
+            # if (confidence < 100):
+            #     id = names[id]
+            #     confidence = "  {0}%".format(round(100 - confidence))
+            # else:
+            #     id = "unknown"
+            #     confidence = "  {0}%".format(round(100 - confidence))
 
-            cv2.putText(img, str(id), (x + 5, y - 5), font, 1, (255, 255, 255), 2)
-            cv2.putText(img, str(confidence), (x + 5, y + h - 5), font, 1, (255, 255, 0), 1)
+            # cv2.putText(img, str(id), (x + 5, y - 5), font, 1, (255, 255, 255), 2)
+            # cv2.putText(img, str(confidence), (x + 5, y + h - 5), font, 1, (255, 255, 0), 1)
 
 
         cv2.imshow('camera', img)
