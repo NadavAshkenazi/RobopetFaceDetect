@@ -20,6 +20,7 @@ def extract_faces(face_id, video):
 
     Path(dataset_dir).mkdir(parents=True, exist_ok=True)
     while success:
+        img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         faces = face_detector.detectMultiScale(gray, 1.3, 5)
 
@@ -81,9 +82,9 @@ def train(face_id, video):
     return count
 
 
-def face_recgonize(face_id):
+def face_recognize(face_id):
     recognizer = cv2.face.LBPHFaceRecognizer_create()
-    recognizer.read('trainer/trainer.yml')
+    recognizer.read(trainer_dir + '/trainer.yml')
     faceCascade = cv2.CascadeClassifier(cascade_path);
 
     font = cv2.FONT_HERSHEY_SIMPLEX
@@ -111,6 +112,7 @@ def face_recgonize(face_id):
 
         ret, img = cam.read()
         # img = cv2.flip(img, -1)  # Flip vertically
+        img = cv2.rotate(img, cv2.ROTATE_180)
 
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -127,7 +129,7 @@ def face_recgonize(face_id):
 
             id, confidence = recognizer.predict(gray[y:y + h, x:x + w])
 
-            if id == int(face_id):
+            if id == int(face_id) and confidence < 100:
                 recognized = True
                 break
 
@@ -164,7 +166,7 @@ def main():
     # video = 'nathan.mp4'
     # count = train(face_id, video)
     # print("\nDetector captured " + str(count) + " faces")
-    is_rec = face_recgonize(face_id)
+    is_rec = face_recognize(face_id)
     print(is_rec)
 
 
