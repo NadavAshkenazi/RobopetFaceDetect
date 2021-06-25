@@ -165,13 +165,13 @@ def getLocation():
     cam.set(4, 480)  # set video height
 
     # Define min window size to be recognized as a face
-    minW = 0.1 * cam.get(3)
-    minH = 0.1 * cam.get(4)
+    minW = 0.05 * cam.get(3)
+    minH = 0.05 * cam.get(4)
 
 
     while True:
         ret, img = cam.read()
-        # img = cv2.flip(img, -1)  # Flip vertically
+        img = cv2.flip(img, -1)  # Flip vertically
 
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -186,7 +186,8 @@ def getLocation():
 
         for (x, y, w, h) in faces:
             cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            return (x + w / 2) / h_i, (y + h / 2) / w_i
+            print(f"height is {h_i}, width is {w_i}, location is: ({x + w / 2}, {y + h / 2})")
+            return (x + w / 2) / w_i, (y + h / 2) / h_i
 
         cv2.imshow('camera', img)
 
@@ -196,13 +197,13 @@ def getLocation():
 
 
 def main():
-    face_id = input('\n enter user id and press <return> ==>  ')
+    #face_id = input('\n enter user id and press <return> ==>  ')
     # video = input('\n enter video path and press <return> ==>  ')
     # video = 'nathan.mp4'
     # count = train(face_id, video)
     # print("\nDetector captured " + str(count) + " faces")
-    is_rec = face_recgonize(face_id)
-    print(is_rec)
+    #is_rec = face_recgonize(face_id)
+    print(getLocation())
 
 
 if __name__ == "__main__":
