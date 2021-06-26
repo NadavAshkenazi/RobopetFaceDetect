@@ -3,6 +3,7 @@ import numpy as np
 from PIL import Image
 import os
 from pathlib import Path
+import time
 
 cascade_path = 'Cascades/haarcascade_frontalface_default.xml'
 dataset_dir = 'dataset'
@@ -157,7 +158,8 @@ def face_recgonize(face_id):
 
     return recognized
 
-def getLocation():
+
+def getLocation(timeout=10):
     faceCascade = cv2.CascadeClassifier(cascade_path)
     # Initialize and start realtime video capture
     cam = cv2.VideoCapture(0)
@@ -168,8 +170,9 @@ def getLocation():
     minW = 0.05 * cam.get(3)
     minH = 0.05 * cam.get(4)
 
+    start_time = time.time()
 
-    while True:
+    while time.time() - start_time < timeout:
         ret, img = cam.read()
         img = cv2.flip(img, -1)  # Flip vertically
 
@@ -194,6 +197,8 @@ def getLocation():
         k = cv2.waitKey(10) & 0xff  # Press 'ESC' for exiting video
         if k == 27:
             break
+
+    return None
 
 
 def main():
