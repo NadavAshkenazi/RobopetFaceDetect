@@ -63,10 +63,7 @@ def getImagesAndLabels(path):
     return faceSamples, ids
 
 
-def train(face_id, video):
-    count = extract_faces(face_id, video)
-    # Path for face image database
-
+def static_train():
     recognizer = cv2.face.LBPHFaceRecognizer_create()
     print("\n [INFO] Training faces. It will take a few seconds. Wait ...")
     faces, ids = getImagesAndLabels(dataset_dir)
@@ -79,7 +76,12 @@ def train(face_id, video):
     # Print the numer of faces trained and end program
     print("\n [INFO] {0} faces trained. Exiting Program".format(len(np.unique(ids))))
 
+
+def train(face_id, video):
+    count = extract_faces(face_id, video)
+    static_train()
     return count
+
 
 def face_recgonize(face_id):
     recognizer = cv2.face.LBPHFaceRecognizer_create()
