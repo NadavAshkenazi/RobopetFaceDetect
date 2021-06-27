@@ -53,7 +53,11 @@ def getImagesAndLabels(path):
         PIL_img = Image.open(imagePath).convert('L')  # convert it to grayscale
         img_numpy = np.array(PIL_img, 'uint8')
 
-        id = int(os.path.split(imagePath)[-1].split(".")[1])
+        if imagePath.startswith('subject'):
+            id = 0
+        else:
+            id = int(os.path.split(imagePath)[-1].split(".")[1])
+
         faces = detector.detectMultiScale(img_numpy)
 
         for (x, y, w, h) in faces:
@@ -86,7 +90,7 @@ def train(face_id, video):
 def face_recgonize(face_id):
     recognizer = cv2.face.LBPHFaceRecognizer_create()
     recognizer.read('trainer/trainer.yml')
-    faceCascade = cv2.CascadeClassifier(cascade_path);
+    faceCascade = cv2.CascadeClassifier(cascade_path)
 
     font = cv2.FONT_HERSHEY_SIMPLEX
 
