@@ -52,8 +52,8 @@ def getImagesAndLabels(path):
     for imagePath in imagePaths:
         PIL_img = Image.open(imagePath).convert('L')  # convert it to grayscale
         img_numpy = np.array(PIL_img, 'uint8')
-
-        if imagePath.startswith('subject'):
+        
+        if 'subject' in imagePath:
             id = 0
         else:
             id = int(os.path.split(imagePath)[-1].split(".")[1])
@@ -220,7 +220,10 @@ def getLocationHostile(timeout=10):
     minH = 0.05 * cam.get(4)
 
     start_time = time.time()
-
+    
+    min_confidence = 10000
+    min_id = -1
+    min_location = (None, None)
     while time.time() - start_time < timeout:
         ret, img = cam.read()
         img = cv2.flip(img, -1)  # Flip vertically
@@ -238,10 +241,18 @@ def getLocationHostile(timeout=10):
 
         for (x, y, w, h) in faces:
             cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            print("hello1")
             id, confidence = recognizer.predict(gray[y:y + h, x:x + w])
-            if confidence > 100:
-                print(f"height is {h_i}, width is {w_i}, location is: ({x + w / 2}, {y + h / 2})")
-                return (x + w / 2) / w_i, (y + h / 2) / h_i
+            print("hello2")
+            print(f"id, confidence = {id}, {confidence}")
+            if confidence < min_confidence:
+                min_confidence = confidence
+                min_id = id
+                min_location = (x + w / 2) / w_i, (y + h / 2) / h_i
+
+            # if confidence > 100 or (id == 0 and confidence < 75):
+            #     print(f"height is {h_i}, width is {w_i}, location is: ({x + w / 2}, {y + h / 2})")
+            #     return (x + w / 2) / w_i, (y + h / 2) / h_i
 
         cv2.imshow('camera', img)
 
@@ -249,7 +260,7 @@ def getLocationHostile(timeout=10):
         if k == 27:
             break
 
-    return None
+    return min_location, min_id, min_confidence
 
 
 def main():
