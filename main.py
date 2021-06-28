@@ -224,36 +224,38 @@ def getLocationHostile(timeout=10):
     min_confidence = 10000
     min_id = -1
     min_location = (None, None)
+    count = 0
     while time.time() - start_time < timeout:
         ret, img = cam.read()
         img = cv2.flip(img, -1)  # Flip vertically
+        if count % 3 == 0:
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            faces = faceCascade.detectMultiScale(
+                gray,
+                scaleFactor=1.2,
+                minNeighbors=5,
+                minSize=(int(minW), int(minH)),
+            )
 
-        faces = faceCascade.detectMultiScale(
-            gray,
-            scaleFactor=1.2,
-            minNeighbors=5,
-            minSize=(int(minW), int(minH)),
-        )
+            h_i, w_i, c = img.shape
 
-        h_i, w_i, c = img.shape
+            for (x, y, w, h) in faces:
+                cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                print("hello1")
+                id, confidence = recognizer.predict(gray[y:y + h, x:x + w])
+                print("hello2")
+                print(f"id, confidence = {id}, {confidence}")
+                if confidence < min_confidence:
+                    min_confidence = confidence
+                    min_id = id
+                    min_location = (x + w / 2) / w_i, (y + h / 2) / h_i
 
-        for (x, y, w, h) in faces:
-            cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            print("hello1")
-            id, confidence = recognizer.predict(gray[y:y + h, x:x + w])
-            print("hello2")
-            print(f"id, confidence = {id}, {confidence}")
-            if confidence < min_confidence:
-                min_confidence = confidence
-                min_id = id
-                min_location = (x + w / 2) / w_i, (y + h / 2) / h_i
+                # if confidence > 100 or (id == 0 and confidence < 75):
+                #     print(f"height is {h_i}, width is {w_i}, location is: ({x + w / 2}, {y + h / 2})")
+                #     return (x + w / 2) / w_i, (y + h / 2) / h_i
 
-            # if confidence > 100 or (id == 0 and confidence < 75):
-            #     print(f"height is {h_i}, width is {w_i}, location is: ({x + w / 2}, {y + h / 2})")
-            #     return (x + w / 2) / w_i, (y + h / 2) / h_i
-
+        count += 1
         cv2.imshow('camera', img)
 
         k = cv2.waitKey(10) & 0xff  # Press 'ESC' for exiting video
