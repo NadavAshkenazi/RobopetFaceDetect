@@ -6,6 +6,7 @@ import pickle
 
 default_dataset_name = 'dataset_faces.dat'
 default_img_path = 'img'
+num_match = 10
 
 
 class FaceRecogniser:
@@ -45,6 +46,8 @@ class FaceRecogniser:
         face_names = []
         process_this_frame = True
 
+        face_count = dict()
+
         while True:
             # Grab a single frame of video
             ret, frame = video_capture.read()
@@ -80,6 +83,10 @@ class FaceRecogniser:
 
                     face_names.append(name)
 
+                    face_count[name] = face_count.get(name, 0) + 1
+                    if face_count[name] >= num_match:
+                        return name
+
             process_this_frame = not process_this_frame
 
             # Display the results
@@ -113,7 +120,7 @@ class FaceRecogniser:
 def main():
     recogniser = FaceRecogniser()
     recogniser.load_embeddings()
-    recogniser.rec_video_from_camera()
+    print(recogniser.rec_video_from_camera())
 
 
 if __name__ == '__main__':
