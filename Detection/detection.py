@@ -24,7 +24,7 @@ class FaceDetector:
                                      columns=["img_id", "is_face", "confidence", "left", "top", "right", "bottom"])
         detections_df = detections_df[detections_df["is_face"] == 1]  # 0: background, 1: face, 2: confidence
         detections_df = detections_df[detections_df["confidence"] >= self.tolerance]
-        aspect_ratio_x, aspect_ratio_y = self.calc_resize_ratio(frame)
+        aspect_ratio_x, aspect_ratio_y = self.get_ratio(frame)
         faces = []
 
         for i, instance in detections_df.iterrows():
@@ -37,11 +37,11 @@ class FaceDetector:
 
         return faces
 
-    def calc_resize_ratio(self, frame):
-        original_size = frame.shape
-        aspect_ratio_x = (original_size[1] / self.target_size[1])
-        aspect_ratio_y = (original_size[0] / self.target_size[0])
-        return aspect_ratio_x, aspect_ratio_y
+    def get_ratio(self, frame):
+        orig_size = frame.shape
+        x_rat = (orig_size[1] / self.target_size[1])
+        y_rat = (orig_size[0] / self.target_size[0])
+        return x_rat, y_rat
 
     def detect_video_from_camera(self):
         vs = VideoStream(src=0).start()
