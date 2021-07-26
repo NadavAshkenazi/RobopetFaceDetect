@@ -17,8 +17,8 @@ class FaceDetector:
 
     def detect_picture(self, frame) -> List:
         small_frame = resize(frame, self.target_size)
-        imageBlob = dnn.blobFromImage(image=small_frame)
-        self.detector.setInput(imageBlob)
+        image_blob = dnn.blobFromImage(image=small_frame)
+        self.detector.setInput(image_blob)
         detections = self.detector.forward()
         detections_df = pd.DataFrame(detections[0][0],
                                      columns=["img_id", "is_face", "confidence", "left", "top", "right", "bottom"])
@@ -107,6 +107,7 @@ def main():
     detector = FaceDetector()
     print(detector.detect_face_location())
     # detector.detect_video_from_camera()
+
 
 if __name__ == "__main__":
     main()

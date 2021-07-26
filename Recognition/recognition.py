@@ -4,14 +4,15 @@ import numpy as np
 import os
 import pickle
 
-default_dataset_name = 'Recognition/dataset_faces.dat'
-default_img_path = 'Recognition/img'
+default_dataset_name = 'dataset_faces.dat'
+default_img_path = 'img'
 
 
 class FaceRecogniser:
     def __init__(self, img_path=default_img_path, dataset_name=default_dataset_name):
-        self.img_path = img_path
-        self.dataset_name = dataset_name
+        dirname = os.path.dirname(__file__)
+        self.img_path = os.path.join(dirname, img_path)
+        self.dataset_path = os.path.join(dirname, dataset_name)
         self.known_face_names = []
         self.known_face_encodings = []
 
@@ -24,13 +25,13 @@ class FaceRecogniser:
             img = face_recognition.load_image_file(filenames[i])
             all_face_encodings[name] = face_recognition.face_encodings(img)[0]
 
-        with open(self.dataset_name, 'wb') as f:
+        with open(self.dataset_path, 'wb') as f:
             pickle.dump(all_face_encodings, f)
 
         self.known_face_encodings = np.array(list(all_face_encodings.values()))
 
     def load_embeddings(self):
-        with open(self.dataset_name, 'rb') as f:
+        with open(self.dataset_path, 'rb') as f:
             all_face_encodings = pickle.load(f)
 
         self.known_face_names = list(all_face_encodings.keys())
