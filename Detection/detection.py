@@ -6,7 +6,7 @@ from imutils.video import VideoStream
 import imutils
 
 frame_size = 300
-frame_count = 2
+process_every = 2
 
 
 class FaceDetector:
@@ -48,7 +48,7 @@ class FaceDetector:
         count = 0
         # loop over the frames from the video stream
         while True:
-            if count % frame_count == 0:
+            if count % process_every == 0:
                 # grab the frame from the threaded video stream and resize it
                 # to have a maximum width of 400 pixels
                 frame = vs.read()
@@ -58,6 +58,9 @@ class FaceDetector:
                     # draw the bounding box of the face along with the associated
                     # probability
                     cv2.rectangle(frame, (left, bottom), (right, top), (0, 255, 0), 2)
+                    # font = cv2.FONT_HERSHEY_DUPLEX
+                    # text = str(left) + "," + str(right) + "," + str(bottom) + "," + str(top)
+                    # cv2.putText(frame, text, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
                 # show the output frame
                 cv2.imshow("Frame", frame)
@@ -74,11 +77,11 @@ class FaceDetector:
 
     def detect_face_location(self):
         vs = VideoStream(src=0).start()
-        count = 0
+        count_frames = 0
         faces = None
         # loop over the frames from the video stream
         while True:
-            if count % frame_count == 0:
+            if count_frames % process_every == 0:
                 # grab the frame from the threaded video stream and resize it
                 # to have a maximum width of 400 pixels
                 frame = vs.read()
@@ -94,13 +97,15 @@ class FaceDetector:
             if key == ord("q"):
                 break
 
-            count += 1
+            count_frames += 1
         # do a bit of cleanup
         cv2.destroyAllWindows()
         vs.stop()
 
-        loc = [face / 400 for face in faces[0]]
-        return loc
+        loc_temp = faces[0]
+        loc = [loc_temp[0] / 300, loc_temp[1] / 400, loc_temp[2] / 300, loc_temp[3] / 400]
+
+        return tuple(loc)
 
 
 def main():

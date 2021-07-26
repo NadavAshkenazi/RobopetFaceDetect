@@ -7,6 +7,7 @@ import pickle
 default_dataset_name = 'dataset_faces.dat'
 default_img_path = 'img'
 num_match = 10
+process_every = 2
 
 
 class FaceRecogniser:
@@ -47,6 +48,7 @@ class FaceRecogniser:
         process_this_frame = True
 
         face_count = dict()
+        count_frames = 0
 
         while True:
             # Grab a single frame of video
@@ -87,7 +89,8 @@ class FaceRecogniser:
                     if face_count[name] >= num_match:
                         return name
 
-            process_this_frame = not process_this_frame
+            process_this_frame = (count_frames % process_every == 0)
+            count_frames += 1
 
             # Display the results
             for (top, right, bottom, left), name in zip(face_locations, face_names):
@@ -116,11 +119,16 @@ class FaceRecogniser:
         video_capture.release()
         cv2.destroyAllWindows()
 
+    def auth_user(self, username):
+        return username == self.rec_video_from_camera()
+
 
 def main():
     recogniser = FaceRecogniser()
+    # recogniser.create_export_embeddings()
     recogniser.load_embeddings()
     print(recogniser.rec_video_from_camera())
+    print(recogniser.auth_user('nathan'))
 
 
 if __name__ == '__main__':
