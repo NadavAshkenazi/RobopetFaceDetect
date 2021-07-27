@@ -75,7 +75,7 @@ class FaceDetector:
         cv2.destroyAllWindows()
         vs.stop()
 
-    def detect_face_location(self):
+    def get_face_location(self):
         vs = VideoStream(src=0).start()
         count_frames = 0
         faces = None
@@ -102,15 +102,16 @@ class FaceDetector:
         cv2.destroyAllWindows()
         vs.stop()
 
-        loc_temp = faces[0]
-        loc = [loc_temp[0] / 300, loc_temp[1] / 400, loc_temp[2] / 300, loc_temp[3] / 400]
-
-        return tuple(loc)
+        top, right, bottom, left = faces[0]
+        return (left + right) / (2 * 400), (bottom + top) / (2 * 300)
+        # loc_temp = faces[0]
+        # loc = [loc_temp[0] / 300, loc_temp[1] / 400, loc_temp[2] / 300, loc_temp[3] / 400]
+        # return tuple(loc)
 
 
 def main():
     detector = FaceDetector()
-    print(detector.detect_face_location())
+    print(detector.get_face_location())
     # detector.detect_video_from_camera()
 
 
