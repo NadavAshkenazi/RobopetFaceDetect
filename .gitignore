@@ -1,0 +1,6 @@
+__MACOSX/*
+trainer/*
+temp/*
+__pycache__/*
+dataset/*
+Recognition/img/*
