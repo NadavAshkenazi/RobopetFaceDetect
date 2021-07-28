@@ -24,7 +24,9 @@ class FaceRecogniser:
         self.known_face_names = [os.path.splitext(base)[0] for base in bases]
         all_face_encodings = {}
         for i, name in enumerate(self.known_face_names):
+            print(name)
             img = face_recognition.load_image_file(filenames[i])
+            img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
             all_face_encodings[name] = face_recognition.face_encodings(img)[0]
 
         with open(self.dataset_path, 'wb') as f:
