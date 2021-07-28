@@ -75,6 +75,10 @@ class FaceRecogniser:
                     matches = face_recognition.compare_faces(self.known_face_encodings, face_encoding)
                     name = "Unknown"
 
+                    # Edge case - There are no users
+                    if len(matches) == 0:
+                        return name
+
                     # # If a match was found in known_face_encodings, just use the first one.
                     # if True in matches:
                     #     first_match_index = matches.index(True)
@@ -128,7 +132,7 @@ class FaceRecogniser:
 
 def main():
     recogniser = FaceRecogniser()
-    # recogniser.create_export_embeddings()
+    recogniser.create_export_embeddings()
     recogniser.load_embeddings()
     print(recogniser.rec_video_from_camera())
     print(recogniser.auth_user('nathan'))

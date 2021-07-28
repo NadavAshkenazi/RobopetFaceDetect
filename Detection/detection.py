@@ -1,9 +1,11 @@
 import pandas as pd
+from time import time
 from typing import List
 from cv2 import dnn, resize
 import cv2
 from imutils.video import VideoStream
 import imutils
+import os
 
 frame_size = 300
 process_every = 2
@@ -11,6 +13,9 @@ process_every = 2
 
 class FaceDetector:
     def __init__(self, prototxt="deploy.prototxt.txt", model="res10_300x300_ssd_iter_140000.caffemodel", tolerance: float = 0.8):
+        dirname = os.path.dirname(__file__)
+        prototxt = os.path.join(dirname, prototxt)
+        model = os.path.join(dirname, model)
         self.detector = dnn.readNetFromCaffe(prototxt, model)
         self.target_size = (frame_size, frame_size)
         self.tolerance = tolerance
@@ -75,16 +80,25 @@ class FaceDetector:
         cv2.destroyAllWindows()
         vs.stop()
 
-    def get_face_location(self):
+    def get_face_location(self, timeout=-1):
         vs = VideoStream(src=0).start()
         count_frames = 0
         faces = None
+        exit_on_to = timeout > 0
+        start_time = time()
         # loop over the frames from the video stream
         while True:
+            if exit_on_to and time() - start_time > timeout:
+                print(time() - start_time)
+                cv2.destroyAllWindows()
+                vs.stop()
+                return None
+
             if count_frames % process_every == 0:
                 # grab the frame from the threaded video stream and resize it
                 # to have a maximum width of 400 pixels
                 frame = vs.read()
+                frame = cv2.flip(frame, 0)
                 frame = imutils.resize(frame, width=400)
                 faces = self.detect_picture(frame)
                 if faces:
